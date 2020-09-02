@@ -1,6 +1,9 @@
-﻿using System;
+﻿using ServerChat.Class;
+using System;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using TCpChat;
 
 namespace TcpChat.Class
 {
@@ -8,9 +11,9 @@ namespace TcpChat.Class
     {
         protected internal string Id { get; private set; }
         protected internal NetworkStream Stream { get; private set; }
-        string userName;
-        TcpClient client;
+
         ServerObject server;
+        TcpClient client;
 
         public ClientObject(TcpClient tcpClient, ServerObject serverObject)
         {
@@ -25,28 +28,14 @@ namespace TcpChat.Class
             try
             {
                 Stream = client.GetStream();
-                string message = GetMessage();
-                userName = message;
-
-                message = userName + " вошел в чат";
-                server.BroadcastMessage(message, this.Id);
-                Console.WriteLine(message);
+                P packet = new P();
+                packet.RecPacket(GetMessage());
+                new ServerPacketCore(packet, server);
                 while (true)
                 {
-                    try
-                    {
-                        message = GetMessage();
-                        message = String.Format("{0}: {1}", userName, message);
-                        Console.WriteLine(message);
-                        server.BroadcastMessage(message, this.Id);
-                    }
-                    catch
-                    {
-                        message = String.Format("{0}: покинул чат", userName);
-                        Console.WriteLine(message);
-                        server.BroadcastMessage(message, this.Id);
-                        break;
-                    }
+                    packet.RecPacket(GetMessage());
+
+                    new ServerPacketCore(packet, server);
                 }
 
             }
@@ -61,7 +50,7 @@ namespace TcpChat.Class
             }
         }
 
-        private string GetMessage()
+        private byte[] GetMessage()
         {
             byte[] data = new byte[64];
             StringBuilder builder = new StringBuilder();
@@ -69,11 +58,10 @@ namespace TcpChat.Class
             do
             {
                 bytes = Stream.Read(data, 0, data.Length);
-                builder.Append(Encoding.Unicode.GetString(data, 0, bytes));
             }
             while (Stream.DataAvailable);
 
-            return builder.ToString();
+            return data;
         }
 
         protected internal void Close()

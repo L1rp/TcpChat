@@ -5,13 +5,15 @@ using System.Net.Sockets;
 using System.Net;
 using System.Text;
 using System.Threading;
+using TCpChat;
+using ServerChat.Class;
 
 namespace TcpChat.Class
 {
     public class ServerObject
     {
-        static TcpListener tcpListener;
         List<ClientObject> clients = new List<ClientObject>();
+        static TcpListener tcpListener;
 
         protected internal void AddConnection(ClientObject clientObject)
         {
@@ -50,15 +52,12 @@ namespace TcpChat.Class
             }
         }
 
-        protected internal void BroadcastMessage(string message, string id)
+        protected internal void BroadcastMessage(string message)
         {
             byte[] data = Encoding.Unicode.GetBytes(message);
             for (int i = 0; i < clients.Count; i++)
             {
-                //if (clients[i].Id != id)
-                //{
-                    clients[i].Stream.Write(data, 0, data.Length);
-                //}
+                clients[i].Stream.Write(data, 0, data.Length);
             }
         }
 

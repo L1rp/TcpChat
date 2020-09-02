@@ -45,11 +45,18 @@
   <ItemGroup>
     <Compile Include="Class\ClientObject.cs" />
     <Compile Include="Class\ServerObject.cs" />
+    <Compile Include="Class\ServerPacketCore.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\TCpChat\TcpChat.csproj">
+      <Project>{0D5BFDEC-7EA6-45AB-B5E6-B39415A70AC1}</Project>
+      <Name>TcpChat</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
